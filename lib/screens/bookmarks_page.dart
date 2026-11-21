@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,9 +29,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
                 fontSize: 22,
               ),
             ),
-            const SizedBox(
-              width: 1,
-            ),
+            const SizedBox(width: 1),
             Text(
               'marks',
               style: GoogleFonts.ptSerif(
@@ -60,8 +58,10 @@ class _BookmarksPageState extends State<BookmarksPage> {
               return StreamBuilder(
                 stream: FirebaseFirestore.instance
                     .collection('bookmarks')
-                    .where('userId',
-                        isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                    .where(
+                      'userId',
+                      isEqualTo: FirebaseAuth.instance.currentUser!.uid,
+                    )
                     .snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -84,8 +84,9 @@ class _BookmarksPageState extends State<BookmarksPage> {
                     );
                   } else {
                     return ListView(
-                      children:
-                          snapshot.data!.docs.map((DocumentSnapshot document) {
+                      children: snapshot.data!.docs.map((
+                        DocumentSnapshot document,
+                      ) {
                         return BlogTile(
                           url: document['newsId'],
                           imageUrl: document['imageFire'],
@@ -106,7 +107,5 @@ class _BookmarksPageState extends State<BookmarksPage> {
 }
 
 Future<void> delayedFuture() async {
-  await Future.delayed(
-    const Duration(milliseconds: 500),
-  ); // Delay duration
+  await Future.delayed(const Duration(milliseconds: 500)); // Delay duration
 }

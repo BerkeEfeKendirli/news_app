@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:news_app/screens/login_screen.dart';
 import 'package:news_app/screens/register_screen.dart';
+
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
 
@@ -35,9 +36,10 @@ class WelcomePage extends StatelessWidget {
                     Text(
                       'Welcome to the home of news!',
                       style: GoogleFonts.ptSerif(
-                          color: const Color.fromARGB(255, 0, 0, 0),
-                          fontSize: 33,
-                          fontWeight: FontWeight.bold),
+                        color: const Color.fromARGB(255, 0, 0, 0),
+                        fontSize: 33,
+                        fontWeight: FontWeight.bold,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 35),
@@ -47,10 +49,10 @@ class WelcomePage extends StatelessWidget {
                         gradient: const LinearGradient(
                           colors: [
                             Color.fromARGB(204, 129, 129, 129),
-                            Colors.black
+                            Colors.black,
                           ],
                           end: Alignment.bottomLeft,
-                          begin: Alignment.topRight
+                          begin: Alignment.topRight,
                         ),
                       ),
                       child: ElevatedButton(

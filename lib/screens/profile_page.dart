@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:news_app/services/auth_service.dart';
 import 'package:news_app/screens/welcome_screen.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -69,7 +69,8 @@ class _ProfilePageState extends State<ProfilePage> {
       },
     );
 
-    if (confirmSignOut == true) {
+    if (confirmSignOut == true && mounted) {
+      if (!mounted) return;
       showDialog(
         context: context,
         builder: (context) {
@@ -81,19 +82,17 @@ class _ProfilePageState extends State<ProfilePage> {
         },
       );
 
-      await Future.delayed(
-        const Duration(milliseconds: 500),
-      );
+      await Future.delayed(const Duration(milliseconds: 500));
 
       await FirebaseAuth.instance.signOut();
-      await GoogleSignIn().signOut();
+      await AuthService.signOutGoogle();
+
+      if (!mounted) return;
 
       Navigator.pop(context);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => const WelcomePage(),
-        ),
+        MaterialPageRoute(builder: (context) => const WelcomePage()),
       );
     }
   }
@@ -101,6 +100,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void changePassword() async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: user.email!);
+      if (!mounted) return;
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -139,7 +139,9 @@ class _ProfilePageState extends State<ProfilePage> {
           );
         },
       );
-    } catch (error) {}
+    } catch (error) {
+      debugPrint('Password reset failed.');
+    }
   }
 
   void deleteUserAccount() async {
@@ -184,7 +186,7 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Text(
                 'Delete',
                 style: GoogleFonts.nunito(
-                  fontSize:20,
+                  fontSize: 20,
                   color: const Color.fromARGB(255, 255, 58, 68),
                   fontWeight: FontWeight.w400,
                 ),
@@ -195,7 +197,8 @@ class _ProfilePageState extends State<ProfilePage> {
       },
     );
 
-    if (confirmDelete == true) {
+    if (confirmDelete == true && mounted) {
+      if (!mounted) return;
       showDialog(
         context: context,
         builder: (context) {
@@ -208,22 +211,22 @@ class _ProfilePageState extends State<ProfilePage> {
       );
 
       try {
-        await Future.delayed(
-          const Duration(milliseconds: 500),
-        );
+        await Future.delayed(const Duration(milliseconds: 500));
 
         await user.delete();
-        await GoogleSignIn().signOut();
+        await AuthService.signOutGoogle();
+
+        if (!mounted) return;
 
         Navigator.pop(context);
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => const WelcomePage(),
-          ),
+          MaterialPageRoute(builder: (context) => const WelcomePage()),
         );
       } catch (e) {
+        if (!mounted) return;
         Navigator.pop(context);
+        if (!mounted) return;
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -282,9 +285,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 fontSize: 22,
               ),
             ),
-            const SizedBox(
-              width: 1,
-            ),
+            const SizedBox(width: 1),
             Text(
               'file',
               style: GoogleFonts.ptSerif(
@@ -293,15 +294,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 fontSize: 22,
               ),
             ),
-            const SizedBox(
-              width: 5,
-            ),
+            const SizedBox(width: 5),
             Text(
-              '(' + user.email.toString() + ')',
+              '(${user.email})',
               style: GoogleFonts.nunito(
-                  color: Colors.black,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500),
+                color: Colors.black,
+                fontSize: 22,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -330,9 +330,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Text(
                         'Change password',
                         style: GoogleFonts.nunito(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                         textAlign: TextAlign.left,
                       ),
                     ),
@@ -358,9 +359,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Text(
                         'Sign Out',
                         style: GoogleFonts.nunito(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                         textAlign: TextAlign.left,
                       ),
                     ),
@@ -386,9 +388,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Text(
                         'Delete Account',
                         style: GoogleFonts.nunito(
-                            color: const Color.fromARGB(255, 255, 58, 68),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),
+                          color: const Color.fromARGB(255, 255, 58, 68),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                         textAlign: TextAlign.left,
                       ),
                     ),

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:news_app/methods/blog_tile.dart';
 import 'package:news_app/models/slider_model.dart';
@@ -13,7 +13,7 @@ class BreakingPage extends StatefulWidget {
 
 class _BreakingPageState extends State<BreakingPage> {
   bool isLoading = true;
-  List<sliderModel> sliders = [];
+  List<SliderModel> sliders = [];
 
   @override
   void initState() {

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:news_app/screens/main_screen.dart';
 
@@ -40,6 +40,7 @@ class _VerifyPageState extends State<VerifyPage> {
 
   Future checkEmailVerified() async {
     await FirebaseAuth.instance.currentUser!.reload();
+    if (!mounted) return;
 
     setState(() {
       isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
@@ -50,8 +51,10 @@ class _VerifyPageState extends State<VerifyPage> {
     try {
       final user = FirebaseAuth.instance.currentUser!;
       await user.sendEmailVerification();
+      if (!mounted) return;
       setState(() => canResendEmail = false);
       await Future.delayed(const Duration(seconds: 5));
+      if (!mounted) return;
       setState(() => canResendEmail = true);
     } catch (e) {
       // print(e.toString());
@@ -82,31 +85,33 @@ class _VerifyPageState extends State<VerifyPage> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(
-                            height: 25,
-                          ),
+                          const SizedBox(height: 25),
                           Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
                               gradient: const LinearGradient(
-                                  colors: [
-                                    Color.fromARGB(204, 129, 129, 129),
-                                    Colors.black
-                                  ],
-                                  end: Alignment.bottomLeft,
-                                  begin: Alignment.topRight),
+                                colors: [
+                                  Color.fromARGB(204, 129, 129, 129),
+                                  Colors.black,
+                                ],
+                                end: Alignment.bottomLeft,
+                                begin: Alignment.topRight,
+                              ),
                             ),
                             width: double.infinity,
                             height: 50,
                             child: ElevatedButton(
-                              onPressed: canResendEmail ? sendVerificationEmail : null,
+                              onPressed: canResendEmail
+                                  ? sendVerificationEmail
+                                  : null,
                               style: ElevatedButton.styleFrom(
                                 elevation: 2,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                ),
                                 backgroundColor: Colors.transparent,
                               ),
                               child: Center(
@@ -121,19 +126,18 @@ class _VerifyPageState extends State<VerifyPage> {
                               ),
                             ),
                           ),
-                          const SizedBox(
-                            height: 20,
-                          ),
+                          const SizedBox(height: 20),
                           Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
                               gradient: const LinearGradient(
-                                  colors: [
-                                    Color.fromARGB(255, 255, 58, 68),
-                                    Color.fromARGB(255, 255, 128, 134),
-                                  ],
-                                  begin: Alignment.bottomLeft,
-                                  end: Alignment.topRight),
+                                colors: [
+                                  Color.fromARGB(255, 255, 58, 68),
+                                  Color.fromARGB(255, 255, 128, 134),
+                                ],
+                                begin: Alignment.bottomLeft,
+                                end: Alignment.topRight,
+                              ),
                             ),
                             width: double.infinity,
                             height: 50,
@@ -144,8 +148,9 @@ class _VerifyPageState extends State<VerifyPage> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                ),
                                 backgroundColor: Colors.transparent,
                               ),
                               child: Center(

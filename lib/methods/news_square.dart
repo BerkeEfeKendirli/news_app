@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class NewsSquareTile extends StatelessWidget {
   const NewsSquareTile({required this.tileHeight, super.key});
   final double tileHeight;
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(

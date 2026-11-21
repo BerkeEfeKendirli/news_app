@@ -2,7 +2,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:news_app/models/currency_model.dart';
-import 'package:news_app/services/api_key.dart';
+import 'package:news_app/services/api_config.dart';
 
 const List<String> desiredCurrencies = [
    "AED", "AFN", "ALL", "AMD",  "AOA", "ARS", "AUD", "AWG", "AZN", 

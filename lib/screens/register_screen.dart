@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:news_app/screens/login_screen.dart';
-import 'package:news_app/screens/main_screen.dart';
+
 import 'package:news_app/screens/verify_mail.dart';
 import 'package:news_app/services/auth_service.dart';
 
@@ -20,12 +20,10 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passController = TextEditingController();
   final TextEditingController confirmPassController = TextEditingController();
-  String _email = "";
-  String _password = "";
-  final String _confirmPassword = "";
   String _errorMessage = "";
 
   void signUserUp() async {
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (context) {
@@ -40,23 +38,27 @@ class _RegisterPageState extends State<RegisterPage> {
     try {
       if (passController.text == confirmPassController.text) {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: emailController.text, password: passController.text);
+          email: emailController.text,
+          password: passController.text,
+        );
+        if (!mounted) return;
         Navigator.pop(context);
         Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const VerifyPage(),
-            ),
-            (route) => false);
+          context,
+          MaterialPageRoute(builder: (context) => const VerifyPage()),
+          (route) => false,
+        );
       } else {
         await Future.delayed(const Duration(milliseconds: 500));
         setState(() {
           _errorMessage = "Passwords don't match";
         });
+        if (!mounted) return;
         Navigator.pop(context);
       }
       // Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
       if (e.code == 'email-already-in-use') {
         setState(() {
@@ -84,22 +86,22 @@ class _RegisterPageState extends State<RegisterPage> {
                       Text(
                         'Sign Up',
                         style: GoogleFonts.ptSerif(
-                            color: Colors.black,
-                            fontSize: 35,
-                            fontWeight: FontWeight.bold),
+                          color: Colors.black,
+                          fontSize: 35,
+                          fontWeight: FontWeight.bold,
+                        ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(
-                        height: 25,
-                      ),
+                      const SizedBox(height: 25),
                       TextFormField(
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           labelText: 'Email',
                           labelStyle: GoogleFonts.nunito(fontSize: 16),
-                          floatingLabelStyle:
-                              const TextStyle(color: Colors.black),
+                          floatingLabelStyle: const TextStyle(
+                            color: Colors.black,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -117,11 +119,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           }
                           return null;
                         },
-                        onChanged: (value) {
-                          setState(() {
-                            _email = value;
-                          });
-                        },
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
@@ -130,8 +127,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         decoration: InputDecoration(
                           labelText: 'Password',
                           labelStyle: GoogleFonts.nunito(fontSize: 16),
-                          floatingLabelStyle:
-                              const TextStyle(color: Colors.black),
+                          floatingLabelStyle: const TextStyle(
+                            color: Colors.black,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -162,25 +160,17 @@ class _RegisterPageState extends State<RegisterPage> {
                           }
                           return null;
                         },
-                        onChanged: (value) {
-                          setState(() {
-                            _password = value;
-                          });
-                        },
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 10),
                       TextFormField(
                         obscureText: !_isConfirmPasswordVisible,
                         controller: confirmPassController,
                         decoration: InputDecoration(
                           labelText: 'Confirm Password',
-                          labelStyle: GoogleFonts.nunito(
-                            fontSize: 16,
+                          labelStyle: GoogleFonts.nunito(fontSize: 16),
+                          floatingLabelStyle: const TextStyle(
+                            color: Colors.black,
                           ),
-                          floatingLabelStyle:
-                              const TextStyle(color: Colors.black),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -219,20 +209,19 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           ),
                         ),
-                      const SizedBox(
-                        height: 25,
-                      ),
+                      const SizedBox(height: 25),
                       Container(
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
                           gradient: const LinearGradient(
-                              colors: [
-                                Color.fromARGB(204, 129, 129, 129),
-                                Colors.black
-                              ],
-                              end: Alignment.bottomLeft,
-                              begin: Alignment.topRight),
+                            colors: [
+                              Color.fromARGB(204, 129, 129, 129),
+                              Colors.black,
+                            ],
+                            end: Alignment.bottomLeft,
+                            begin: Alignment.topRight,
+                          ),
                         ),
                         child: ElevatedButton(
                           onPressed: () {
@@ -260,9 +249,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
+                      const SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -271,9 +258,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               color: Color.fromARGB(204, 129, 129, 129),
                             ),
                           ),
-                          const SizedBox(
-                            width: 10,
-                          ),
+                          const SizedBox(width: 10),
                           Text(
                             'Or continue with',
                             style: GoogleFonts.nunito(
@@ -281,9 +266,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(
-                            width: 10,
-                          ),
+                          const SizedBox(width: 10),
                           const Expanded(
                             child: Divider(
                               color: Color.fromARGB(204, 129, 129, 129),
@@ -291,9 +274,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
+                      const SizedBox(height: 20),
                       GestureDetector(
                         onTap: () => AuthService().signInWithGoogle(context),
                         child: Container(
@@ -301,12 +282,13 @@ class _RegisterPageState extends State<RegisterPage> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             gradient: const LinearGradient(
-                                colors: [
-                                  Color.fromARGB(255, 255, 58, 68),
-                                  Color.fromARGB(255, 255, 128, 134),
-                                ],
-                                begin: Alignment.bottomLeft,
-                                end: Alignment.topRight),
+                              colors: [
+                                Color.fromARGB(255, 255, 58, 68),
+                                Color.fromARGB(255, 255, 128, 134),
+                              ],
+                              begin: Alignment.bottomLeft,
+                              end: Alignment.topRight,
+                            ),
                           ),
                           height: 50,
                           child: Center(
@@ -317,9 +299,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
+                      const SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -331,9 +311,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(
-                            width: 4,
-                          ),
+                          const SizedBox(width: 4),
                           GestureDetector(
                             onTap: () {
                               setState(() {

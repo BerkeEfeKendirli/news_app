@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 
 class ForgotPassword extends StatefulWidget {
   const ForgotPassword({super.key});
@@ -24,6 +23,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       return;
     }
 
+    if (!mounted) return;
+
     showDialog(
       context: context,
       builder: (context) {
@@ -39,11 +40,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       await FirebaseAuth.instance.sendPasswordResetEmail(
         email: emailController.text,
       );
+      if (!mounted) return;
       Navigator.pop(context);
       setState(() {
         _errorMessage = 'Password reset link has been sent to your email.';
       });
     } on FirebaseAuthException {
+      if (!mounted) return;
       Navigator.pop(context);
       setState(() {
         _errorMessage = 'Please enter a valid email';
@@ -73,17 +76,16 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(
-                      height: 25,
-                    ),
+                    const SizedBox(height: 25),
                     TextFormField(
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         labelText: 'Email',
                         labelStyle: GoogleFonts.overpass(fontSize: 16),
-                        floatingLabelStyle:
-                            const TextStyle(color: Colors.black),
+                        floatingLabelStyle: const TextStyle(
+                          color: Colors.black,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -96,19 +98,18 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 15,
-                    ),
+                    const SizedBox(height: 15),
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                         gradient: const LinearGradient(
-                            colors: [
-                              Color.fromARGB(204, 129, 129, 129),
-                              Colors.black
-                            ],
-                            end: Alignment.bottomLeft,
-                            begin: Alignment.topRight),
+                          colors: [
+                            Color.fromARGB(204, 129, 129, 129),
+                            Colors.black,
+                          ],
+                          end: Alignment.bottomLeft,
+                          begin: Alignment.topRight,
+                        ),
                       ),
                       width: double.infinity,
                       height: 50,

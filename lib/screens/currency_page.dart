@@ -1,5 +1,5 @@
 // lib/currency_page.dart
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:news_app/models/currency_model.dart';
@@ -10,7 +10,7 @@ class CurrencyPage extends StatefulWidget {
   const CurrencyPage({super.key});
 
   @override
-  _CurrencyPageState createState() => _CurrencyPageState();
+  State<CurrencyPage> createState() => _CurrencyPageState();
 }
 
 class _CurrencyPageState extends State<CurrencyPage> {
@@ -21,8 +21,8 @@ class _CurrencyPageState extends State<CurrencyPage> {
   @override
   void initState() {
     super.initState();
-    futureCurrencies =
-        CurrencyService(targetCurrencies: desiredCurrencies).fetchCurrencies();
+    futureCurrencies = CurrencyService(targetCurrencies: desiredCurrencies)
+        .fetchCurrencies();
   }
 
   void _showFilterDialog(BuildContext context) {
@@ -30,8 +30,9 @@ class _CurrencyPageState extends State<CurrencyPage> {
       context: context,
       builder: (context) {
         String? selectedBaseCurrency = this.selectedBaseCurrency;
-        List<String> selectedTargetCurrencies =
-            List.from(this.selectedTargetCurrencies);
+        List<String> selectedTargetCurrencies = List.from(
+          this.selectedTargetCurrencies,
+        );
         List<bool> selectedStates = desiredCurrencies
             .map((currency) => selectedTargetCurrencies.contains(currency))
             .toList();
@@ -43,9 +44,10 @@ class _CurrencyPageState extends State<CurrencyPage> {
                 child: Text(
                   'Filter Currencies',
                   style: GoogleFonts.ptSerif(
-                      color: Colors.black,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700),
+                    color: Colors.black,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
               contentPadding: const EdgeInsets.fromLTRB(5, 10, 5, 10),
@@ -56,9 +58,10 @@ class _CurrencyPageState extends State<CurrencyPage> {
                     Text(
                       'Select base currency',
                       style: GoogleFonts.nunito(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500),
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                     DropdownButton<String>(
                       value: selectedBaseCurrency,
@@ -67,8 +70,9 @@ class _CurrencyPageState extends State<CurrencyPage> {
                           selectedBaseCurrency = newValue;
                         });
                       },
-                      items: desiredCurrencies
-                          .map<DropdownMenuItem<String>>((String value) {
+                      items: desiredCurrencies.map<DropdownMenuItem<String>>((
+                        String value,
+                      ) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
@@ -78,66 +82,68 @@ class _CurrencyPageState extends State<CurrencyPage> {
                     const SizedBox(height: 10),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 5),
-                      child: Container(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            SizedBox(
-                              width: 120,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    selectedTargetCurrencies =
-                                        List.from(desiredCurrencies);
-                                    selectedStates = List.filled(
-                                        desiredCurrencies.length, true);
-                                  });
-                                },
-                                child: Text(
-                                  'Select All',
-                                  style: GoogleFonts.nunito(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          SizedBox(
+                            width: 120,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  selectedTargetCurrencies = List.from(
+                                    desiredCurrencies,
+                                  );
+                                  selectedStates = List.filled(
+                                    desiredCurrencies.length,
+                                    true,
+                                  );
+                                });
+                              },
+                              child: Text(
+                                'Select All',
+                                style: GoogleFonts.nunito(
+                                  color: Colors.black,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            SizedBox(
-                              width: 120,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    selectedTargetCurrencies = [];
-                                    selectedStates = List.filled(
-                                        desiredCurrencies.length, false);
-                                  });
-                                },
-                                child: Text(
-                                  'Deselect All',
-                                  style: GoogleFonts.nunito(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                          ),
+                          const SizedBox(width: 5),
+                          SizedBox(
+                            width: 120,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  selectedTargetCurrencies = [];
+                                  selectedStates = List.filled(
+                                    desiredCurrencies.length,
+                                    false,
+                                  );
+                                });
+                              },
+                              child: Text(
+                                'Deselect All',
+                                style: GoogleFonts.nunito(
+                                  color: Colors.black,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 10),
                     Text(
                       'Select Target Currencies',
                       style: GoogleFonts.nunito(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400),
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                     ListBody(
                       children: desiredCurrencies.asMap().entries.map((entry) {
@@ -145,7 +151,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
                         final currency = entry.value;
                         final countryCode =
                             currencyToCountryCode[currency]?.toLowerCase() ??
-                                "un";
+                            "un";
                         return CheckboxListTile(
                           activeColor: const Color.fromARGB(255, 255, 58, 68),
                           title: Row(
@@ -156,8 +162,12 @@ class _CurrencyPageState extends State<CurrencyPage> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(16),
                                   border: Border.all(
-                                    color:
-                                        const Color.fromARGB(255, 97, 97, 97),
+                                    color: const Color.fromARGB(
+                                      255,
+                                      97,
+                                      97,
+                                      97,
+                                    ),
                                   ),
                                 ),
                                 child: ClipRRect(
@@ -181,9 +191,10 @@ class _CurrencyPageState extends State<CurrencyPage> {
                               Text(
                                 currency,
                                 style: GoogleFonts.nunito(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold),
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ],
                           ),
@@ -218,7 +229,9 @@ class _CurrencyPageState extends State<CurrencyPage> {
                   onPressed: () {
                     Navigator.of(context).pop();
                     _updateCurrencies(
-                        selectedBaseCurrency!, selectedTargetCurrencies);
+                      selectedBaseCurrency!,
+                      selectedTargetCurrencies,
+                    );
                   },
                 ),
               ],
@@ -232,8 +245,9 @@ class _CurrencyPageState extends State<CurrencyPage> {
   void _updateCurrencies(String baseCurrency, List<String> targetCurrencies) {
     setState(() {
       futureCurrencies = CurrencyService(
-              baseCurrency: baseCurrency, targetCurrencies: targetCurrencies)
-          .fetchCurrencies();
+        baseCurrency: baseCurrency,
+        targetCurrencies: targetCurrencies,
+      ).fetchCurrencies();
     });
   }
 
@@ -249,19 +263,19 @@ class _CurrencyPageState extends State<CurrencyPage> {
             Text(
               'Currency',
               style: GoogleFonts.ptSerif(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 22),
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+                fontSize: 22,
+              ),
             ),
-            const SizedBox(
-              width: 1,
-            ),
+            const SizedBox(width: 1),
             Text(
               'Rates',
               style: GoogleFonts.ptSerif(
-                  color: const Color.fromARGB(255, 255, 58, 68),
-                  fontWeight: FontWeight.w800,
-                  fontSize: 22),
+                color: const Color.fromARGB(255, 255, 58, 68),
+                fontWeight: FontWeight.w800,
+                fontSize: 22,
+              ),
             ),
           ],
         ),
@@ -269,13 +283,11 @@ class _CurrencyPageState extends State<CurrencyPage> {
         elevation: 1,
         actions: [
           IconButton(
-            icon: const Icon(
-              Icons.filter_list,
-            ),
+            icon: const Icon(Icons.filter_list),
             onPressed: () {
               _showFilterDialog(context);
             },
-          )
+          ),
         ],
       ),
       body: FutureBuilder<List<Currency>>(
@@ -288,9 +300,7 @@ class _CurrencyPageState extends State<CurrencyPage> {
               ),
             );
           } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
+            return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
               child: Text(
@@ -349,9 +359,10 @@ class _CurrencyPageState extends State<CurrencyPage> {
                   trailing: Text(
                     currency.rate.toStringAsFixed(3),
                     style: GoogleFonts.nunito(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600),
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 );
               },

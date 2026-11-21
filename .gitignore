@@ -44,3 +44,6 @@ app.*.map.json
 
 # Ignore the api_key.dart file in the lib/services directory
 lib/services/api_key.dart
+.env
+.env.*
+!.env.example

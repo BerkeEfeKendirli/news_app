@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:news_app/methods/blog_tile.dart';
 import 'package:news_app/models/article_model.dart';
 import 'package:news_app/services/news_data.dart';

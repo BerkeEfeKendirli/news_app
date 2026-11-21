@@ -1,7 +1,8 @@
 import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
@@ -30,31 +31,42 @@ class _ArticleViewState extends State<ArticleView> {
   bool _isBookmarked = false;
   bool _isProcessing = false; // To track if a process is already running
   Timer? _debounceTimer;
+  late final WebViewController _webViewController;
 
   @override
   void initState() {
     super.initState();
+    _webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadRequest(Uri.parse(widget.blogUrl));
     _checkBookmarkStatus();
   }
 
   Future<void> _checkBookmarkStatus() async {
     bool isBookmarked = await _isBookmarkedAsync(widget.blogUrl);
+    if (!mounted) return;
     setState(() {
       _isBookmarked = isBookmarked;
     });
   }
 
   Future<bool> _isBookmarkedAsync(String newsId) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return false;
     var query = await FirebaseFirestore.instance
         .collection('bookmarks')
-        .where('userId', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .where('userId', isEqualTo: user.uid)
         .where('newsId', isEqualTo: newsId)
         .get();
     return query.docs.isNotEmpty;
   }
 
   Future<void> _toggleBookmark(
-      String blogUrl, String urlToImage, String title, String source) async {
+    String blogUrl,
+    String urlToImage,
+    String title,
+    String source,
+  ) async {
     if (_isProcessing) return; // Return if a process is already running
 
     setState(() {
@@ -62,8 +74,9 @@ class _ArticleViewState extends State<ArticleView> {
     });
 
     try {
-      var bookmarksCollection =
-          FirebaseFirestore.instance.collection('bookmarks');
+      var bookmarksCollection = FirebaseFirestore.instance.collection(
+        'bookmarks',
+      );
       var query = await bookmarksCollection
           .where('userId', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
           .where('newsId', isEqualTo: blogUrl)
@@ -77,32 +90,29 @@ class _ArticleViewState extends State<ArticleView> {
           'sourceFire': source,
           'titleFire': title,
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Bookmark added.'),
-          ),
-        );
+        if (!mounted) return;
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Bookmark added.')));
       } else {
         for (var doc in query.docs) {
           await doc.reference.delete();
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Bookmark removed.'),
-          ),
-        );
+        if (!mounted) return;
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Bookmark removed.')));
       }
       _checkBookmarkStatus();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to toggle bookmark: $e'),
-        ),
-      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to toggle bookmark: $e')));
     } finally {
-      setState(() {
-        _isProcessing = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isProcessing = false;
+        });
+      }
     }
   }
 
@@ -111,7 +121,11 @@ class _ArticleViewState extends State<ArticleView> {
 
     _debounceTimer = Timer(const Duration(milliseconds: 500), () {
       _toggleBookmark(
-          widget.blogUrl, widget.urlToImage, widget.title, widget.source);
+        widget.blogUrl,
+        widget.urlToImage,
+        widget.title,
+        widget.source,
+      );
     });
   }
 
@@ -138,9 +152,7 @@ class _ArticleViewState extends State<ArticleView> {
                 fontSize: 22,
               ),
             ),
-            const SizedBox(
-              width: 1,
-            ),
+            const SizedBox(width: 1),
             Text(
               'News',
               style: GoogleFonts.ptSerif(
@@ -154,12 +166,7 @@ class _ArticleViewState extends State<ArticleView> {
         centerTitle: true,
         elevation: 1,
       ),
-      body: SafeArea(
-        child: WebView(
-          initialUrl: widget.blogUrl,
-          javascriptMode: JavascriptMode.unrestricted,
-        ),
-      ),
+      body: SafeArea(child: WebViewWidget(controller: _webViewController)),
       bottomNavigationBar: BottomAppBar(
         color: Colors.white,
         child: Row(
@@ -167,13 +174,9 @@ class _ArticleViewState extends State<ArticleView> {
           children: [
             IconButton(
               onPressed: () {
-                Clipboard.setData(
-                  ClipboardData(text: widget.blogUrl),
-                );
+                Clipboard.setData(ClipboardData(text: widget.blogUrl));
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Link copied to clipboard.'),
-                  ),
+                  const SnackBar(content: Text('Link copied to clipboard.')),
                 );
               },
               icon: const Icon(Icons.link),
@@ -184,10 +187,9 @@ class _ArticleViewState extends State<ArticleView> {
                 if (await canLaunchUrl(url)) {
                   await launchUrl(url, mode: LaunchMode.externalApplication);
                 } else {
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Could not launch URL.'),
-                    ),
+                    const SnackBar(content: Text('Could not launch URL.')),
                   );
                 }
               },
@@ -195,7 +197,7 @@ class _ArticleViewState extends State<ArticleView> {
             ),
             IconButton(
               onPressed: () {
-                Share.share(widget.blogUrl);
+                SharePlus.instance.share(ShareParams(text: widget.blogUrl));
               },
               icon: const Icon(Icons.share),
             ),

@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:news_app/screens/forgotpw_screen.dart';
 import 'package:news_app/screens/main_screen.dart';
@@ -18,8 +18,6 @@ class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  String _email = "";
-  String _password = "";
   String _errorMessage = "";
 
   void handleLogin() async {
@@ -30,6 +28,8 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       _errorMessage = "";
     });
+
+    if (!mounted) return;
 
     showDialog(
       context: context,
@@ -44,15 +44,18 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailController.text, password: passwordController.text);
+        email: emailController.text,
+        password: passwordController.text,
+      );
+      if (!mounted) return;
       Navigator.pop(context);
       Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const NewsScreen(),
-          ),
-          (route) => false);
+        context,
+        MaterialPageRoute(builder: (context) => const NewsScreen()),
+        (route) => false,
+      );
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context); // Dismiss the loading indicator
       setState(() {
         _errorMessage = 'Wrong email or password';
@@ -63,16 +66,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void showErrorMessage(String message) {
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: Text(
             message,
-            style: GoogleFonts.nunito(
-              color: Colors.black,
-              fontSize: 24,
-            ),
+            style: GoogleFonts.nunito(color: Colors.black, fontSize: 24),
           ),
           actions: <Widget>[
             TextButton(
@@ -82,8 +83,9 @@ class _LoginPageState extends State<LoginPage> {
               child: Text(
                 'OK',
                 style: GoogleFonts.nunito(
-                    color: const Color.fromARGB(255, 0, 128, 255),
-                    fontWeight: FontWeight.bold),
+                  color: const Color.fromARGB(255, 0, 128, 255),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
@@ -110,22 +112,22 @@ class _LoginPageState extends State<LoginPage> {
                       Text(
                         'Sign In',
                         style: GoogleFonts.ptSerif(
-                            color: Colors.black,
-                            fontSize: 35,
-                            fontWeight: FontWeight.bold),
+                          color: Colors.black,
+                          fontSize: 35,
+                          fontWeight: FontWeight.bold,
+                        ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(
-                        height: 25,
-                      ),
+                      const SizedBox(height: 25),
                       TextFormField(
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           labelText: 'Email',
                           labelStyle: GoogleFonts.nunito(fontSize: 16),
-                          floatingLabelStyle:
-                              const TextStyle(color: Colors.black),
+                          floatingLabelStyle: const TextStyle(
+                            color: Colors.black,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -143,11 +145,6 @@ class _LoginPageState extends State<LoginPage> {
                           }
                           return null;
                         },
-                        onChanged: (value) {
-                          setState(() {
-                            _email = value;
-                          });
-                        },
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
@@ -156,8 +153,9 @@ class _LoginPageState extends State<LoginPage> {
                         decoration: InputDecoration(
                           labelText: 'Password',
                           labelStyle: GoogleFonts.nunito(fontSize: 16),
-                          floatingLabelStyle:
-                              const TextStyle(color: Colors.black),
+                          floatingLabelStyle: const TextStyle(
+                            color: Colors.black,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -188,11 +186,6 @@ class _LoginPageState extends State<LoginPage> {
                           }
                           return null;
                         },
-                        onChanged: (value) {
-                          setState(() {
-                            _password = value;
-                          });
-                        },
                       ),
                       if (_errorMessage.isNotEmpty || _errorMessage != '')
                         Padding(
@@ -206,9 +199,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 10),
                       Align(
                         alignment: Alignment.centerRight,
                         child: GestureDetector(
@@ -232,19 +223,18 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 5,
-                      ),
+                      const SizedBox(height: 5),
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
                           gradient: const LinearGradient(
-                              colors: [
-                                Color.fromARGB(204, 129, 129, 129),
-                                Colors.black
-                              ],
-                              end: Alignment.bottomLeft,
-                              begin: Alignment.topRight),
+                            colors: [
+                              Color.fromARGB(204, 129, 129, 129),
+                              Colors.black,
+                            ],
+                            end: Alignment.bottomLeft,
+                            begin: Alignment.topRight,
+                          ),
                         ),
                         height: 50,
                         child: ElevatedButton(
@@ -271,9 +261,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
+                      const SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -282,9 +270,7 @@ class _LoginPageState extends State<LoginPage> {
                               color: Color.fromARGB(204, 129, 129, 129),
                             ),
                           ),
-                          const SizedBox(
-                            width: 10,
-                          ),
+                          const SizedBox(width: 10),
                           Text(
                             'Or continue with',
                             style: GoogleFonts.nunito(
@@ -292,9 +278,7 @@ class _LoginPageState extends State<LoginPage> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(
-                            width: 10,
-                          ),
+                          const SizedBox(width: 10),
                           const Expanded(
                             child: Divider(
                               color: Color.fromARGB(204, 129, 129, 129),
@@ -302,9 +286,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
+                      const SizedBox(height: 20),
                       GestureDetector(
                         onTap: () => AuthService().signInWithGoogle(context),
                         child: Container(
@@ -312,12 +294,13 @@ class _LoginPageState extends State<LoginPage> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             gradient: const LinearGradient(
-                                colors: [
-                                  Color.fromARGB(255, 255, 58, 68),
-                                  Color.fromARGB(255, 255, 128, 134),
-                                ],
-                                begin: Alignment.bottomLeft,
-                                end: Alignment.topRight),
+                              colors: [
+                                Color.fromARGB(255, 255, 58, 68),
+                                Color.fromARGB(255, 255, 128, 134),
+                              ],
+                              begin: Alignment.bottomLeft,
+                              end: Alignment.topRight,
+                            ),
                           ),
                           height: 50,
                           child: Center(
@@ -328,9 +311,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
+                      const SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -342,9 +323,7 @@ class _LoginPageState extends State<LoginPage> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(
-                            width: 4,
-                          ),
+                          const SizedBox(width: 4),
                           GestureDetector(
                             onTap: () {
                               setState(() {

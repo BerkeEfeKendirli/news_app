@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:news_app/models/slider_model.dart';
-import 'package:news_app/services/api_key.dart';
+import 'package:news_app/services/api_config.dart';
 
 class Sliders {
-  List<sliderModel> sliders = [];
+  List<SliderModel> sliders = [];
 
   Future<void> getSlider() async {
     String url =
@@ -19,7 +19,7 @@ class Sliders {
               ""; // Provide a default value if description is null
           String imageUrl = element["urlToImage"] ??
               "https://i.ibb.co/q7bYPKN/placeholder-image21.png"; // Use a default image URL if urlToImage is null
-          sliderModel slidermodel = sliderModel(
+          SliderModel slidermodel = SliderModel(
             title: element["title"],
             description: description,
             url: element["url"],

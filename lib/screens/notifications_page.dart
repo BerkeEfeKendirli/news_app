@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class NotificationsPage extends StatefulWidget {
@@ -22,16 +22,17 @@ class _NotificationsPageState extends State<NotificationsPage> {
             Text(
               'Notifica',
               style: GoogleFonts.ptSerif(
-                  color: Colors.black, fontWeight: FontWeight.w600),
+                color: Colors.black,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            const SizedBox(
-              width: 1,
-            ),
+            const SizedBox(width: 1),
             Text(
               'tions',
               style: GoogleFonts.ptSerif(
-                  color: const Color.fromARGB(255, 255, 58, 68),
-                  fontWeight: FontWeight.w800),
+                color: const Color.fromARGB(255, 255, 58, 68),
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ],
         ),
