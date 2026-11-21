@@ -15,6 +15,7 @@ class CategoryNews extends StatefulWidget {
 class _CategoryNewsState extends State<CategoryNews> {
   List<ArticleModel> articles = [];
   bool _loading = true;
+  String? _loadError;
 
   @override
   void initState() {
@@ -35,9 +36,17 @@ class _CategoryNewsState extends State<CategoryNews> {
   Future<void> getNews() async {
     setState(() {
       _loading = true; // Show loading indicator
+      _loadError = null;
     });
     News newsclass = News();
-    await newsclass.getNews(widget.name.toLowerCase());
+    final category = widget.name;
+    try {
+      await newsclass.getNews(category.toLowerCase());
+    } catch (error) {
+      if (!mounted || widget.name != category) return;
+      _loadError = error.toString();
+    }
+    if (!mounted || widget.name != category) return;
     setState(() {
       articles = newsclass.news;
       _loading = false; // Hide loading indicator
@@ -46,27 +55,30 @@ class _CategoryNewsState extends State<CategoryNews> {
 
   @override
   Widget build(BuildContext context) {
+    if (_loadError != null) {
+      return Center(child: Text(_loadError!, textAlign: TextAlign.center));
+    }
     return _loading
         ? const Center(
-          child: Padding(
-            padding: EdgeInsets.only(top: 16),
-            child: CircularProgressIndicator(
-              color: Color.fromARGB(255, 255, 58, 68),
+            child: Padding(
+              padding: EdgeInsets.only(top: 16),
+              child: CircularProgressIndicator(
+                color: Color.fromARGB(255, 255, 58, 68),
+              ),
             ),
-          ),
-        )
+          )
         : ListView.builder(
-          shrinkWrap: true,
-          physics: const ClampingScrollPhysics(),
-          itemCount: articles.length,
-          itemBuilder: (context, index) {
-            return BlogTile(
-              imageUrl: articles[index].urlToImage!,
-              sourceName: articles[index].source!,
-              title: articles[index].title!,
-              url: articles[index].url!,
-            );
-          },
-        );
+            shrinkWrap: true,
+            physics: const ClampingScrollPhysics(),
+            itemCount: articles.length,
+            itemBuilder: (context, index) {
+              return BlogTile(
+                imageUrl: articles[index].urlToImage!,
+                sourceName: articles[index].source!,
+                title: articles[index].title!,
+                url: articles[index].url!,
+              );
+            },
+          );
   }
 }

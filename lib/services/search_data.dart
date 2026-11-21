@@ -1,23 +1,24 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:news_app/models/search_model.dart';
-import 'package:news_app/services/api_config.dart';
+import 'package:news_app/services/news_api.dart';
 
 class Search {
   List<SearchModel> search = [];
 
   Future<void> getSearchNews(String query) async {
-    String url =
-        "http://newsapi.org/v2/everything?q=$query&language=en&apiKey=$newsApiKey";
-    var response = await http.get(Uri.parse(url));
-    var jsonData = jsonDecode(response.body);
+    final jsonData = await NewsApi().get('everything', {
+      'q': query,
+      'language': 'en',
+    });
+    search.clear();
 
     if (jsonData['status'] == 'ok') {
       jsonData["articles"].forEach((element) {
         if (element["title"] != "[Removed]") {
-          String description = element["description"] ??
+          String description =
+              element["description"] ??
               ""; // Provide a default value if description is null
-          String imageUrl = element["urlToImage"] ??
+          String imageUrl =
+              element["urlToImage"] ??
               "https://i.ibb.co/q7bYPKN/placeholder-image21.png"; // Use a default image URL if urlToImage is null
           SearchModel searchModel = SearchModel(
             title: element["title"],

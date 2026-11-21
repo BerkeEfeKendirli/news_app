@@ -15,6 +15,7 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   List<SearchModel> searchResults = [];
   bool isLoading = true;
+  String? _loadError;
   @override
   void initState() {
     getSearchNews();
@@ -23,7 +24,12 @@ class _SearchPageState extends State<SearchPage> {
 
   Future<void> getSearchNews() async {
     Search searchclass = Search();
-    await searchclass.getSearchNews(widget.searchQuery);
+    try {
+      await searchclass.getSearchNews(widget.searchQuery);
+    } catch (error) {
+      _loadError = error.toString();
+    }
+    if (!mounted) return;
     searchResults = searchclass.search;
     setState(() {
       isLoading = false;
@@ -44,10 +50,10 @@ class _SearchPageState extends State<SearchPage> {
               Text(
                 'Search results for "${widget.searchQuery.toUpperCase()}"',
                 style: GoogleFonts.nunito(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
-                    
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -62,17 +68,19 @@ class _SearchPageState extends State<SearchPage> {
               ),
             )
           : searchResults.isNotEmpty
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: buildSearchResults(),
-                )
-              : Center(
-                  child: Text('No search results found.',
-                      style: GoogleFonts.nunito(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 18,
-                      ),),
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: buildSearchResults(),
+            )
+          : Center(
+              child: Text(
+                _loadError ?? 'No search results found.',
+                style: GoogleFonts.nunito(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 18,
                 ),
+              ),
+            ),
     );
   }
 

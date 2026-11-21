@@ -29,6 +29,7 @@ class _HomePageState extends State<HomePage> {
   bool _showClearIcon = false;
   int _selectedCategoryIndex = 0;
   bool _loading = true;
+  String? _loadError;
 
   @override
   void initState() {
@@ -39,7 +40,12 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> fetchData() async {
     categories = getCategory();
-    await getSlider();
+    try {
+      await getSlider();
+    } catch (error) {
+      _loadError = error.toString();
+    }
+    if (!mounted) return;
     setState(() {
       _loading = false;
     });
@@ -52,7 +58,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    _focusNode.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_loadError != null) {
+      return Center(child: Text(_loadError!, textAlign: TextAlign.center));
+    }
     return _loading
         ? const Center(
             child: CircularProgressIndicator(
@@ -65,9 +81,7 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.white,
                 height: double.infinity,
                 child: Padding(
-                  padding: const EdgeInsets.only(
-                    top: 10,
-                  ),
+                  padding: const EdgeInsets.only(top: 10),
                   child: SingleChildScrollView(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -100,8 +114,8 @@ class _HomePageState extends State<HomePage> {
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     SearchPage(
-                                                        searchQuery:
-                                                            searchQuery),
+                                                      searchQuery: searchQuery,
+                                                    ),
                                               ),
                                             );
                                             setState(() {
@@ -112,55 +126,75 @@ class _HomePageState extends State<HomePage> {
                                         },
                                         // textAlignVertical: TextAlignVertical.bottom,
                                         decoration: InputDecoration(
-                                            hintText: 'Search...',
-                                            hintStyle: const TextStyle(
+                                          hintText: 'Search...',
+                                          hintStyle: const TextStyle(
+                                            color: Color.fromARGB(
+                                              146,
+                                              129,
+                                              129,
+                                              129,
+                                            ),
+                                          ),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                vertical: 4,
+                                                horizontal: 16,
+                                              ),
+                                          border: OutlineInputBorder(
+                                            borderSide: const BorderSide(
                                               color: Color.fromARGB(
-                                                  146, 129, 129, 129),
-                                            ),
-                                            contentPadding:
-                                                const EdgeInsets.symmetric(
-                                                    vertical: 4,
-                                                    horizontal: 16),
-                                            border: OutlineInputBorder(
-                                              borderSide: const BorderSide(
-                                                color: Color.fromARGB(
-                                                    255, 240, 241, 250),
+                                                255,
+                                                240,
+                                                241,
+                                                250,
                                               ),
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
                                             ),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderSide: const BorderSide(
-                                                color: Color.fromARGB(
-                                                    255,
-                                                    82,
-                                                    82,
-                                                    82), // Change to your desired color
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
+                                            borderRadius: BorderRadius.circular(
+                                              16,
                                             ),
-                                            suffixIcon: _showClearIcon
-                                                ? GestureDetector(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        _searchController
-                                                            .clear();
-                                                        _showClearIcon = false;
-                                                        _focusNode.unfocus();
-                                                      });
-                                                    },
-                                                    child: const Icon(
-                                                      Icons.clear,
-                                                      color: Color.fromARGB(
-                                                          146, 129, 129, 129),
-                                                    ),
-                                                  )
-                                                : const Icon(
-                                                    Icons.search,
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: const BorderSide(
+                                              color: Color.fromARGB(
+                                                255,
+                                                82,
+                                                82,
+                                                82,
+                                              ), // Change to your desired color
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              16,
+                                            ),
+                                          ),
+                                          suffixIcon: _showClearIcon
+                                              ? GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      _searchController.clear();
+                                                      _showClearIcon = false;
+                                                      _focusNode.unfocus();
+                                                    });
+                                                  },
+                                                  child: const Icon(
+                                                    Icons.clear,
                                                     color: Color.fromARGB(
-                                                        146, 129, 129, 129),
-                                                  ),),
+                                                      146,
+                                                      129,
+                                                      129,
+                                                      129,
+                                                    ),
+                                                  ),
+                                                )
+                                              : const Icon(
+                                                  Icons.search,
+                                                  color: Color.fromARGB(
+                                                    146,
+                                                    129,
+                                                    129,
+                                                    129,
+                                                  ),
+                                                ),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -169,9 +203,7 @@ class _HomePageState extends State<HomePage> {
                             ],
                           ),
                         ),
-                        const SizedBox(
-                          height: 24,
-                        ),
+                        const SizedBox(height: 24),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 15),
                           child: Row(
@@ -180,9 +212,10 @@ class _HomePageState extends State<HomePage> {
                               Text(
                                 'Breaking News',
                                 style: GoogleFonts.ptSerif(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold),
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               InkWell(
                                 onTap: () {
@@ -199,36 +232,32 @@ class _HomePageState extends State<HomePage> {
                                     Text(
                                       'See All',
                                       style: GoogleFonts.nunito(
-                                          color: const Color.fromARGB(
-                                              255, 0, 128, 255),
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600),
+                                        color: const Color.fromARGB(
+                                          255,
+                                          0,
+                                          128,
+                                          255,
+                                        ),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
-                                    const SizedBox(
-                                      width: 8,
-                                    ),
+                                    const SizedBox(width: 8),
                                     const Icon(
                                       Icons.arrow_forward,
                                       color: Color.fromARGB(255, 0, 128, 255),
-                                    )
+                                    ),
                                   ],
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(
-                          height: 16,
-                        ),
+                        const SizedBox(height: 16),
                         buildSlider(),
-                        const SizedBox(
-                          height: 24,
-                        ),
+                        const SizedBox(height: 24),
                         Padding(
-                          padding: const EdgeInsets.only(
-                            left: 15,
-                            right: 7,
-                          ),
+                          padding: const EdgeInsets.only(left: 15, right: 7),
                           child: SizedBox(
                             height: 32,
                             child: ListView.builder(
@@ -244,9 +273,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          height: 8,
-                        ),
+                        const SizedBox(height: 8),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 15),
                           child: selectedCategoryName != null
@@ -283,7 +310,7 @@ class _HomePageState extends State<HomePage> {
               ? const LinearGradient(
                   colors: [
                     Color.fromARGB(255, 255, 58, 68),
-                    Color.fromARGB(255, 255, 128, 134)
+                    Color.fromARGB(255, 255, 128, 134),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -335,91 +362,96 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildImage(String image, int index, String name, String url,
-          String source, String desc) =>
-      GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ArticleView(
-                urlToImage: image,
-                title: name,
-                source: source,
-                blogUrl: url,
-              ),
-            ),
-          );
-        },
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 8),
-          child: Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: SizedBox(
-                  height: double.infinity,
-                  child: CachedNetworkImage(
-                    imageUrl: image,
-                    fit: BoxFit.cover,
-                    width: MediaQuery.of(context).size.width,
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                height: double.infinity,
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(94, 0, 0, 0),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Center(
-                        child: Text(
-                          name,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.ptSerif(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      Text(
-                        desc,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.nunito(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w100,
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: Text(
-                          source,
-                          style: GoogleFonts.nunito(
-                            color: const Color.fromARGB(255, 255, 255, 255),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+  Widget buildImage(
+    String image,
+    int index,
+    String name,
+    String url,
+    String source,
+    String desc,
+  ) => GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ArticleView(
+            urlToImage: image,
+            title: name,
+            source: source,
+            blogUrl: url,
           ),
         ),
       );
+    },
+    child: Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      child: Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: SizedBox(
+              height: double.infinity,
+              child: CachedNetworkImage(
+                imageUrl: image,
+                fit: BoxFit.cover,
+                width: MediaQuery.of(context).size.width,
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            height: double.infinity,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(94, 0, 0, 0),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Center(
+                    child: Text(
+                      name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.ptSerif(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Text(
+                    desc,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.nunito(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w100,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Text(
+                      source,
+                      style: GoogleFonts.nunito(
+                        color: const Color.fromARGB(255, 255, 255, 255),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }

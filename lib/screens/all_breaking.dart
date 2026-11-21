@@ -13,6 +13,7 @@ class BreakingPage extends StatefulWidget {
 
 class _BreakingPageState extends State<BreakingPage> {
   bool isLoading = true;
+  String? _loadError;
   List<SliderModel> sliders = [];
 
   @override
@@ -23,7 +24,12 @@ class _BreakingPageState extends State<BreakingPage> {
 
   Future<void> getSlider() async {
     Sliders slider = Sliders();
-    await slider.getSlider();
+    try {
+      await slider.getSlider();
+    } catch (error) {
+      _loadError = error.toString();
+    }
+    if (!mounted) return;
     sliders = slider.sliders;
     setState(() {
       isLoading = false;
@@ -32,6 +38,12 @@ class _BreakingPageState extends State<BreakingPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_loadError != null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: Center(child: Text(_loadError!)),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -44,19 +56,19 @@ class _BreakingPageState extends State<BreakingPage> {
               Text(
                 'Breaking',
                 style: GoogleFonts.ptSerif(
-                    color: Colors.black,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600),
+                  color: Colors.black,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              const SizedBox(
-                width: 1,
-              ),
+              const SizedBox(width: 1),
               Text(
                 'News',
                 style: GoogleFonts.ptSerif(
-                    color: const Color.fromARGB(255, 255, 58, 68),
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800),
+                  color: const Color.fromARGB(255, 255, 58, 68),
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ],
           ),
@@ -71,19 +83,19 @@ class _BreakingPageState extends State<BreakingPage> {
               ),
             )
           : sliders.isNotEmpty
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: buildBreakingNews(),
-                )
-              : Center(
-                  child: Text(
-                    'No breaking news found.',
-                    style: GoogleFonts.nunito(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 18,
-                    ),
-                  ),
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: buildBreakingNews(),
+            )
+          : Center(
+              child: Text(
+                'No breaking news found.',
+                style: GoogleFonts.nunito(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 18,
                 ),
+              ),
+            ),
     );
   }
 
